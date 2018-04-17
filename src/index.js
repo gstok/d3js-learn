@@ -6,7 +6,17 @@ let p = d3.select("#d3-area").selectAll("p").text("你好，世界");
 p.style("color", "#549233");
 p.style("font-size", "16px");
 
-p.datum("无序列表项目");
+let dataSet = Array(p.size()).fill(0).map((item, index) => index + 1).reverse();
+dataSet.push(33);
+dataSet.push(67);
+
+//p.datum("无序列表项目");
+let update = p.data(dataSet);
+
+console.log(update);
+console.log(update.enter());
+console.log(update.exit());
+
 p.text((d, i) => {
     return (d + "  " + (i + 1)).toString();
 });
