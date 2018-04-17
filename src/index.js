@@ -32,9 +32,21 @@ let update = tr.data(dataSet);
 let enter = update.enter();
 let exit = update.exit();
 
+d3.selectAll("table > tbody > tr > td").remove();
+
+update.append("td").text(d => d.id);
+update.append("td").text(d => d.name);
+update.append("td").text(d => d.sex);
+update.append("td").text(d => d.age);
+update.append("td").text(d => d.address);
+
 let newTr = enter.select("table > tbody").append("tr");
 newTr.append("td").text(d => d.id);
 newTr.append("td").text(d => d.name);
 newTr.append("td").text(d => d.sex);
 newTr.append("td").text(d => d.age);
 newTr.append("td").text(d => d.address);
+
+exit.remove();
+
+
