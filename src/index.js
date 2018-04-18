@@ -1,5 +1,4 @@
 
-
 import * as d3 from "d3";
 
 let d3Area = d3.select("#d3-area");
@@ -16,47 +15,57 @@ mySvg.attr("width", width);
 mySvg.attr("height", height);
 
 mySvg.append("rect");
+mySvg.append("text");
 
-let update = mySvg.selectAll("rect").data(dataSet);
-let enter = update.enter();
-let exit = update.exit();
-
-function setAttrs (rects) {
-    rects
-        .attr("x", (d, i) => i * rectStep + pading.left)
-        .attr("y", d => height - d - pading.bottom)
-        .attr("width", rectWidth)
-        .attr("height", d => d)
-        .attr("fill", "steelblue");
+function reDraw (dataSet) {
+    let rectUpdate = mySvg.selectAll("rect").data(dataSet);
+    let rectEnter = rectUpdate.enter();
+    let rectExit = rectUpdate.exit();
+    function rectSetAttrs (rects) {
+        rects
+            .attr("x", (d, i) => i * rectStep + pading.left)
+            .attr("y", d => height - d - pading.bottom)
+            .attr("width", rectWidth)
+            .attr("height", d => d)
+            .attr("fill", "steelblue");
+    }
+    rectSetAttrs(rectUpdate);
+    let rects = rectEnter.append("rect");
+    rectSetAttrs(rects);
+    rectExit.remove();
+    
+    let textUpdate = mySvg.selectAll("text").data(dataSet);
+    let textEnter = textUpdate.enter();
+    let textExit = textUpdate.exit();
+    function textSetAttrs (texts) {
+        texts
+            .text(d => d)
+            .attr("fill", "white")
+            .attr("x", (d, i) => i * rectStep + pading.left)
+            .attr("y", d => height - d - pading.bottom)
+            .attr("dx", rectWidth / 2)
+            .attr("dy", "1em")
+            .attr("text-anchor", "middle")
+            .attr("font-size", "12px");
+    }
+    textSetAttrs(textUpdate);
+    let texts = textEnter.append("text");
+    textSetAttrs(texts);
+    textExit.remove();
 }
 
-setAttrs(update);
-
-let rects = enter.append("rect");
-setAttrs(rects);
-
-exit.remove();
+reDraw(dataSet);
 
 
+d3Area.append("button")
 
 
-let textUpdate = mySvg.selectAll("text").data(dataSet);
-let textEnter = textUpdate.enter();
-let textExit = textUpdate.exit();
+document.getElementById("sortBtn").addEventListener("click", () => {
+    dataSet.sort((a, b) => b - a);
+    reDraw(dataSet);
+});
 
-
-function textSetAttrs (texts) {
-    texts
-        .text(d => d)
-        .attr("fill", "white")
-        .attr("x", (d, i) => i * rectStep + pading.left)
-        .attr("y", d => height - d - pading.bottom)
-        .attr("dx", rectWidth / 2)
-        .attr("dy", "1em")
-        .attr("text-anchor", "middle")
-        .attr("font-size", "12px");
-}
-
-
-let texts = textEnter.append("text");
-textSetAttrs(texts);
+document.getElementById("randBtn").addEventListener("click", () => {
+    dataSet.push(Math.floor(Math.random() * 200));
+    reDraw(dataSet);
+});
