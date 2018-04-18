@@ -1,54 +1,62 @@
 
 
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
-let p = d3.select("#d3-area").selectAll("p").text("你好，世界");
-p.style("color", "#549233");
-p.style("font-size", "16px");
+let d3Area = d3.select("#d3-area");
 
-let dataSet = Array(p.size()).fill(0).map((item, index) => index + 1).reverse();
-dataSet.push(33);
-dataSet.push(67);
+let width = 640;
+let height = 480;
+let rectStep = 40;
+let rectWidth = 30;
+let pading = { top: 20, bottom: 20, left: 20, right: 20 };
+let dataSet = [70, 45, 33, 180, 26, 76, 100, 20, 66];
 
-//p.datum("无序列表项目");
-let update = p.data(dataSet);
+let mySvg = d3Area.append("svg");
+mySvg.attr("width", width);
+mySvg.attr("height", height);
 
-console.log(update);
-console.log(update.enter());
-console.log(update.exit());
+mySvg.append("rect");
 
-p.text((d, i) => {
-    return (d + "  " + (i + 1)).toString();
-});
+let update = mySvg.selectAll("rect").data(dataSet);
+let enter = update.enter();
+let exit = update.exit();
 
-p.append("span").text((d, i) => {
-    return d.toString();
-});
+function setAttrs (rects) {
+    rects
+        .attr("x", (d, i) => i * rectStep + pading.left)
+        .attr("y", d => height - d - pading.bottom)
+        .attr("width", rectWidth)
+        .attr("height", d => d)
+        .attr("fill", "steelblue");
+}
+
+setAttrs(update);
+
+let rects = enter.append("rect");
+setAttrs(rects);
+
+exit.remove();
 
 
-// console.log(li.empty());
-// console.log(li.node());
-// console.log(li.size());
 
-// let mySvg = d3.select("body").append("svg")
-//     .attr("width", 640)
-//     .attr("height", 480);
-// mySvg.classed("mysvg", true);
 
-// console.log(mySvg.classed("mysvg"));
+let textUpdate = mySvg.selectAll("text").data(dataSet);
+let textEnter = textUpdate.enter();
+let textExit = textUpdate.exit();
 
-// mySvg.append("circle")
-//     .attr("cx", 30)
-//     .attr("cy", 30)
-//     .attr("r", 20)
-//     .attr("fill", "#93e255");
 
-// let body = d3.select("body");
-// let input = body.append("input");
-// input.attr("type", "text");
-// input.attr("value", "你好，世界");
-// input.property("value", "你不好，世界");
+function textSetAttrs (texts) {
+    texts
+        .text(d => d)
+        .attr("fill", "white")
+        .attr("x", (d, i) => i * rectStep + pading.left)
+        .attr("y", d => height - d - pading.bottom)
+        .attr("dx", rectWidth / 2)
+        .attr("dy", "1em")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px");
+}
 
-// let span = body.insert("span", "input").text("这里是span");
-// body.insert("textarea", "span").text("这里是textarea");
-// span.remove();
+
+let texts = textEnter.append("text");
+textSetAttrs(texts);
