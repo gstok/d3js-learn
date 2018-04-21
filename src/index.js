@@ -1,13 +1,10 @@
 
 import * as d3 from "d3";
 
-let linear = d3.scaleLinear();
-linear.domain([-1000, 1000]);
-linear.range([0, 100]);
+let pow = d3.scalePow();
+pow.exponent(3);
 
-let ticks = linear.ticks(5);
-let tickFormart = linear.tickFormat(5, "+d");
+pow.domain([0, 5]);
+pow.range([0, 1000]);
 
-console.log(ticks);
-
-console.log(ticks.map(tickFormart));
+console.log(pow(1.5));
