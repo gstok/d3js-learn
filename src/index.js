@@ -1,27 +1,24 @@
 
 import * as d3 from "d3";
 
+//普通的序数比例尺
+let ordinal1 = d3.scaleOrdinal();
+ordinal1.domain([1, 2, 3, 4, 5]);
+ordinal1.range(["一", "二", "三", "四", "五"]);
+console.log(ordinal1(3));
 
-let linear = d3.scaleLinear();
-linear.domain([0, 100]);
-linear.range([10, 50]);
 
+//貌似d3 v4的pading规则变了
+let ordinal2 = d3.scalePoint();
+ordinal2.domain([1, 2, 3, 4, 5]);
+ordinal2.range([0, 100]);
+console.log(ordinal2(2));
+ordinal2.padding(1);
+for (let i = 1; i < 6; ++i) {
+    console.log(ordinal2(i));
+}
 
-let quantize = d3.scaleQuantize();
-quantize.domain([0, 100]);
-quantize.range(["#333", "#555", "#777", "#999", "#bbb", "#ddd"].reverse());
-
-let dataSet = [5, 10, 30, 40, 50, 60, 70, 80];
-
-let mySvg = d3.select("svg");
-
-let update = mySvg.selectAll("circle").data(dataSet);
-
-let enter = update.enter();
-
-enter.append("circle")
-    .attr("cx", (d, i) => i * 70 + 50)
-    .attr("cy", 300)
-    .attr("r", d => linear(d))
-    .attr("fill", d => quantize(d));
-
+ordinal2.rangeRound([0, 100]).padding(1);
+for (let i = 1; i < 6; ++i) {
+    console.log(ordinal2(i));
+}
