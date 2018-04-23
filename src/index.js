@@ -1,22 +1,33 @@
 
 import * as d3 from "d3";
 
-let ordinal = d3.scaleOrdinal(d3.schemeCategory10);
-for (let i = 0; i < 20; ++i) {
-    console.log(ordinal(Math.random()));
+// let linear = d3.scaleLinear();
+// linear.domain([0, 100, 200]);
+// linear.range([0, 1000, 1010]);
+
+// console.log(linear(101));
+
+
+// let quantile1 = d3.scaleQuantile();
+// quantile1.domain([0, 10]);
+// quantile1.range(["一", "二", "三", "四", "五"]);
+// console.log(quantile1(11));
+// console.log(quantile1.quantiles());
+
+
+let quantize = d3.scaleQuantize();
+quantize.domain([0, 2, 4, 10]);
+quantize.range([1, 100]);
+for (let i = 0; i < 11; ++i) {
+    console.log(i, quantize(i));
 }
 
 
-let svg = d3.select("svg");
-let dataSet = Array(1000).fill(0).map((item, index) => index + 1);
 
-svg.selectAll("circle")
-    .data(dataSet)
-    .enter()
-    .append("circle")
-    .attr("cx", () => Math.random() * 640)
-    .attr("cy", () => Math.random() * 480)
-    .attr("fill", d => ordinal(d))
-    .attr("r", () => Math.random() * 20 + 5);
-
-
+let quantile3 = d3.scaleQuantile();
+quantile3.domain([0, 2, 4, 10]);
+quantile3.range([1, 100]);
+console.log(quantile3.quantiles());
+for (let i = 0; i < 11; ++i) {
+    console.log(i, quantile3(i));
+}
