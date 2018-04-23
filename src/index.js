@@ -1,19 +1,22 @@
 
 import * as d3 from "d3";
 
-let scaleBand = d3.scaleBand();
-scaleBand.domain([1, 2, 3, 4, 5]);
-scaleBand.range([0, 100]);
-scaleBand.padding(0.5);
-scaleBand.paddingOuter(1);
+let ordinal = d3.scaleOrdinal(d3.schemeCategory10);
+for (let i = 0; i < 20; ++i) {
+    console.log(ordinal(Math.random()));
+}
 
-let numList = Array(5).fill(0).map((item, index) => index + 1);
 
-numList.forEach(num => {
-    console.log(scaleBand(num));
-});
+let svg = d3.select("svg");
+let dataSet = Array(1000).fill(0).map((item, index) => index + 1);
 
-console.log("————");
-console.log(scaleBand.step());
-console.log(scaleBand.bandwidth());
-console.log(scaleBand.padding());
+svg.selectAll("circle")
+    .data(dataSet)
+    .enter()
+    .append("circle")
+    .attr("cx", () => Math.random() * 640)
+    .attr("cy", () => Math.random() * 480)
+    .attr("fill", d => ordinal(d))
+    .attr("r", () => Math.random() * 20 + 5);
+
+
