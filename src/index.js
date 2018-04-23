@@ -1,17 +1,13 @@
 
 import * as d3 from "d3";
 
-let linear = d3.scaleLinear();
-linear.domain([0, 100]);
-linear.range([0, 200]);
+let powScale = d3.scalePow();
+powScale.exponent(2);
+powScale.domain([0, 5]);
+powScale.range([0, 400]);
 
-let axis = d3.axisBottom(linear);
-axis.ticks(5);
-// axis.tickValues([0, 1, 10, 100]);
-axis.tickSizeInner(2);
-axis.tickSizeOuter(20);
-axis.tickFormat(d3.format("0.1f"));
 
+let axis = d3.axisBottom(powScale);
 
 let svg = d3.select("svg");
 let gAxis = svg.append("g");
