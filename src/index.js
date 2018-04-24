@@ -1,13 +1,21 @@
 
 import * as d3 from "d3";
 
-let dataSet = Array(10).fill(0).map(() => Math.random() * 1000 + 50);
+let dataSet = Array(10).fill(0).map(() => {
+    return {
+        x: Math.random() * 1000,
+        y: Math.random() * 640,
+        size: Math.random() * 100 + 10
+    }
+});
 let width = 1200;
 let height = 700;
 let padding = {
     x: 100,
     y: 100,
 };
+
+console.log(dataSet);
 
 //位置定位
 function translate (x, y) {
@@ -26,60 +34,66 @@ function addSvg () {
 
 //创建X轴比例尺
 function createXScale () {
-    let xScale = d3.scaleBand();
-    xScale.domain(d3.range(dataSet.length));
+    let xScale = d3.scaleLinear();
+    xScale.domain([0, d3.max(dataSet, d => d.x)]);
+    xScale.nice();
     xScale.range([0, width - padding.x * 2]);
-    xScale.padding(0.2);
     return xScale;
 }
 //创建Y轴比例尺
 function createYScale () {
     let yScale = d3.scaleLinear();
-    yScale.domain([0, d3.max(dataSet)]);
+    yScale.domain([0, d3.max(dataSet, d => d.y)]);
     yScale.nice();
     yScale.range([0, height - padding.y * 2]);
     return yScale;
 }
 
+//创建尺寸比例尺
+function createSizeScale () {
+    let scale = d3.scaleLinear();
+    scale.domain([0, d3.max(dataSet, d => d.y)]);
+    scale.nice();
+    scale.range([10, 100]);
+    return scale;
+}
 
-//更新柱状图
-function updateBar (g, xScale, yScale) {
+
+//更新图
+function updateScatter (g, xScale, yScale, sizeScale) {
     let colorOrdinal = d3.scaleOrdinal(d3.schemeCategory10);
-    let rectUpdate = g.selectAll("rect").data(dataSet);
-    let rectEnter = rectUpdate.enter();
-    let rectExit = rectUpdate.exit();
-    function setRectAttr (rects) {
-        rects
-            .attr("x", (d, i) => xScale(i) + padding.x)
-            .attr("y", d => height - yScale(d) - padding.y)
-            .attr("width", xScale.bandwidth())
-            .attr("height", d => yScale(d))
-            .attr("fill", d => colorOrdinal(d));
+    let circleUpdate = g.selectAll("circle").data(dataSet);
+    let circleEnter = circleUpdate.enter();
+    let circleExit = circleUpdate.exit();
+    function setCircleAttrs (circles) {
+        circles
+            .attr("cx", d => xScale(d.x) + padding.x)
+            .attr("cy", d => height - yScale(d.y) - padding.y)
+            .attr("r", d => sizeScale(d.size))
+            .attr("fill", (d, i) => colorOrdinal(i));
     }
-    setRectAttr(rectUpdate);
-    let rects = rectEnter.append("rect");
-    setRectAttr(rects);
-    rectExit.remove();
+    setCircleAttrs(circleUpdate);
+    let circles = circleEnter.append("circle");
+    setCircleAttrs(circles);
+    circleExit.remove();
 
     let textUpdate = g.selectAll("text").data(dataSet);
     let textEnter = textUpdate.enter();
     let textExit = textUpdate.exit();
-    function setTextsAttr (texts) {
+    function setTextAttrs (texts) {
         texts
-            .attr("x", (d, i) => xScale(i) + padding.x)
-            .attr("y", d => height - yScale(d) - padding.y)
-            .attr("fill", "white")
-            .attr("font-size", "14px")
-            .attr("dx", xScale.bandwidth() / 2)
-            .attr("dy", "1em")
-            .attr("text-anchor", "middle")
-            .text(d => d3.format("0.1f")(d));
+            .attr("x", d => xScale(d.x) + padding.x)
+            .attr("y", d => height - yScale(d.y) - padding.y)
+            .attr("dx", -5)
+            .attr("dy", "0.4em")
+            .text((d, i) => i.toString());
     }
-    setTextsAttr(textUpdate);
+    setTextAttrs(textUpdate);
     let texts = textEnter.append("text");
-    setTextsAttr(texts);
+    setTextAttrs(texts);
     textExit.remove();
 }
+
 //更新X坐标轴
 function updateXAxis (g, scale) {
     let xAxis = d3.axisBottom(scale);
@@ -88,7 +102,7 @@ function updateXAxis (g, scale) {
 }
 //更新Y坐标轴
 function updateYAxis (g, scale) {
-    scale.domain([d3.max(dataSet), 0]);
+    scale.domain([d3.max(dataSet, d => d.y), 0]);
     scale.nice();
     let yAxis = d3.axisLeft(scale);
     g.attr("transform", translate(padding.x, padding.y));
@@ -107,21 +121,21 @@ let gYAxis = svg.append("g");
 function update () {
     let xScale = createXScale();
     let yScale = createYScale();
-    updateBar(gBar, xScale, yScale);
+    let sizeScale = createSizeScale();
+    updateScatter(gBar, xScale, yScale, sizeScale);
     updateXAxis(gXAxis, xScale);
     updateYAxis(gYAxis, yScale);
 }
 
 update();
 
-document.getElementById("sortBtn").addEventListener("click", () => {
-    dataSet = dataSet.sort((a, b) => b - a);
-    update();
-});
-
 document.getElementById("randAddBtn").addEventListener("click", () => {
-    let newNum = Math.random() * 1000 + 50;
-    dataSet.push(newNum);
+    let newItem = {
+        x: Math.random() * 1000,
+        y: Math.random() * 640,
+        size: Math.random() * 100 + 10
+    };
+    dataSet.push(newItem);
     update();
 });
 
